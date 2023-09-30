@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grade Dist display test</title>
+</head>
+<body>
+
+    <input type="text" id="subjectSelect" list="subjects" placeholder="CSCE"/>
+      <datalist id="subjects">
+    </datalist>
+
+    <input type="text" id="courseSelect" list="courseNumbers" placeholder="123"/>
+      <datalist id="courseNumbers">
+    </datalist>
+
+    <script>
+
+        course_data = {};
+        
+        // Fetch JSON data and populate the dropdown
+        fetch('http://127.0.0.1:8000/get_subject_codes')
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                course_data = data;
+                const subjectSelect = document.getElementById('subjects');
+                data.forEach(subject => {
+                    const option = document.createElement('option');
+                    option.value = subject['subject_code'];
+                    option.textContent = subject['subject_code'];
+                    subjectSelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+
+        // Search button click event
+        document.getElementById('subjectSelect').addEventListener('input', () => {
+            const typedSubjectCode = document.getElementById('subjectSelect').value;
+            try {
+                course_codes = course_data.filter(item => item.subject_code === typedSubjectCode.toUpperCase())[0].course_numbers;
+                console.log(course_codes);
+
+                const courseNumbersDatalist = document.getElementById('courseNumbers');
+                // Clear existing options in the datalist
+                courseNumbersDatalist.innerHTML = '';
+
+                course_codes.forEach(courseCode => {
+                    const option = document.createElement('option');
+                    option.value = courseCode;
+                    option.textContent = courseCode;
+                    courseNumbersDatalist.appendChild(option);
+                });
+                
+
+            }catch(err){
+                console.log("subject not found");
+            }
+        });
+    </script>
+</body>
+</html>
