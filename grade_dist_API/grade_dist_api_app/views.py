@@ -10,6 +10,13 @@ def home(request):
     return render(request, 'display.html')
 
 
+def get_profs(request, subject_code, course_code):
+    professors = Section.objects.filter(subject_code=subject_code.upper(), course_code=course_code).values_list('professor_name', flat=True).distinct()
+
+    professor_data = [{'professor': prof} for prof in professors]
+
+    return JsonResponse(professor_data, safe=False)
+
 def get_subject_codes(request):
 
     # Get all unique subject codes
