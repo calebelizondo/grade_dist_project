@@ -31,7 +31,6 @@ def get_profs(request, subject_code, course_code):
     subject_code = subject_code.upper()
     course_code = course_code.upper()
 
-    # Filter the SectionGrade objects based on subject code and course code
     section_grades = Section.objects.filter(subject_code=subject_code, course_code=course_code)
 
     professor_data = []

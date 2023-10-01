@@ -4,20 +4,100 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grade Dist display test</title>
+
+    <style>
+    body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 20px;
+    }
+
+    .left-panel {
+        flex: 1;
+        padding: 10px;
+        background-color: #f5f5f5;
+        border-radius: 5px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        height:200px;
+
+    }
+
+    .right-panel {
+        flex: 1;
+        padding: 10px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        overflow-y: auto; /* Add scroll when needed */
+        height: 200px; /* Limit the height of the professors list */
+    }
+
+    /* Style for text inputs */
+    input[type="text"] {
+        width: 80%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    /* Style for labels */
+    label {
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    /* Style for the professors list */
+    ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    li {
+        margin-bottom: 10px;
+    }
+
+    label {
+        display: flex;
+        align-items: center;
+    }
+
+    input[type="checkbox"] {
+        margin-right: 10px;
+    }
+
+</style>
 </head>
 <body>
 
-    <input type="text" id="subjectSelect" list="subjects" placeholder="CSCE"/>
-      <datalist id="subjects">
-    </datalist>
+    <div class="left-panel">
+        <label for="subjectSelect">Enter a subject code:</label>
+        <input type="text" id="subjectSelect" list="subjects" placeholder="CSCE">
+        <datalist id="subjects">
+        </datalist>
+        <br> 
+        <label for="courseSelect">Enter a course number:</label>
+        <input type="text" id="courseSelect" list="courseNumbers" placeholder="123">
+        <datalist id="courseNumbers">
+        </datalist>
+    </div>
 
-    <input type="text" id="courseSelect" list="courseNumbers" placeholder="123"/>
-      <datalist id="courseNumbers">
-    </datalist>
+    <div class="right-panel">
+        <form id="professorsForm">
+            <ul id="professorsList">
+                <!-- Professors will be added here dynamically -->
+            </ul>
+        </form>
+    </div>
 
     <script>
 
         course_data = {};
+        current_subject_code = "";
+        professorsData = {};
         
         // Fetch JSON data and populate the subject codes dropdown
         fetch('http://127.0.0.1:8000/get_subject_codes')
@@ -38,9 +118,9 @@
         //detect whether a subject has been selected. If so, populate 
         document.getElementById('subjectSelect').addEventListener('input', () => {
             const typedSubjectCode = document.getElementById('subjectSelect').value;
+
             try {
                 course_codes = course_data.filter(item => item.subject_code === typedSubjectCode.toUpperCase())[0].course_numbers;
-                console.log(course_codes);
 
                 const courseNumbersDatalist = document.getElementById('courseNumbers');
                 // Clear existing options in the datalist
@@ -52,6 +132,8 @@
                     option.textContent = courseCode;
                     courseNumbersDatalist.appendChild(option);
                 });
+
+                input = current_subject_code;
                 
 
             }catch(err){
@@ -59,9 +141,47 @@
             }
         });
 
-        //detect if a course has been selected. If so, get the professots
-        document.getElementById('courseSelect').addEventListener('input', () => {
 
+    function addProfessorsToForm() {
+        const professorsList = document.getElementById('professorsList');
+        professorsList.innerHTML = "";
+
+        // Loop through the professor data and create checkboxes
+        for (const professorInfo of professorsData) {
+            const listItem = document.createElement('li');
+            const label = document.createElement('label');
+            const checkbox = document.createElement('input');
+
+            checkbox.type = 'checkbox';
+            checkbox.name = 'professors';
+            checkbox.value = professorInfo.professor;
+
+            label.appendChild(checkbox);
+            label.appendChild(document.createTextNode(professorInfo.professor));
+            listItem.appendChild(label);
+            professorsList.appendChild(listItem);
+        }
+    }
+
+        //detect if a course has been selected. If so, get the professors
+        document.getElementById('courseSelect').addEventListener('input', () => {
+            console.log('event');
+            const typedSubjectCode = document.getElementById('subjectSelect').value;
+            const typedCourseCode = document.getElementById('courseSelect').value;
+            if ((course_data.filter(item => item.subject_code === typedSubjectCode.toUpperCase() && item.course_numbers.includes(typedCourseCode))).length !== 0){
+                fetch(`http://127.0.0.1:8000/get_profs/${typedSubjectCode.toUpperCase()}/${typedCourseCode}`)
+                .then(response => response.json())
+                .then(data => {
+
+                if (data.length !== 0){
+                    professorsData = data;
+                    console.log(professorsData);
+                    addProfessorsToForm();
+                }
+
+            })
+            .catch(error => console.error('Error fetching data:', error));
+            }
             
         });
     </script>
