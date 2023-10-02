@@ -25,15 +25,13 @@
             flex: 1;
             padding: 10px;
             background-color: #ffffff;
-            border-radius: 5px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-            height: 200px; 
+            height:200px;
         }
 
         .right-panel {
             flex: 1;
             padding: 10px;
-            background-color: #ffffff;
+            background-color: #f5f5f5;
             border-radius: 5px;
             box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
             overflow-y: auto; /* Add scroll when needed */
@@ -75,16 +73,23 @@
             margin-right: 10px;
         }
 
-        .professor-cards {
+        .professor-cards-container {
             width: 100%;
+            height: 250px;
             padding: 10px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: flex-start;
+            overflow-x: auto; /* Enable horizontal scrolling */
+            white-space: nowrap; /* Prevent cards from wrapping to a new row */
+        }
+
+        .professor-cards {
+            display: flex; /* Display cards in a horizontal row *
+            justify-content: flex-start; /* Align cards to the start of the container */
+            height: 100%;
         }
 
         .professor-card {
-            flex: 0 0 calc(33.33% - 20px); /* Adjust card width based on desired layout */
+            width: 200px; /* Set a fixed width for each card */
+            height: 90%; /* Adjust the height as needed */
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
@@ -94,16 +99,33 @@
         .professor-name {
             font-weight: bold;
         }
+
+        /* Navigation buttons */
+        .nav-buttons {
+            margin-top: 10px;
+        }
+
+        .nav-button {
+            padding: 5px 10px;
+            margin-right: 10px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #f5f5f5;
+        }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+    
+        
     <div class="top-panel">
         <div class="left-panel">
             <label for="subjectSelect">Enter a subject code:</label>
             <input type="text" id="subjectSelect" list="subjects" placeholder="CSCE">
             <datalist id="subjects">
             </datalist>
-            <br> 
+            <br> <br>
             <label for="courseSelect">Enter a course number:</label>
             <input type="text" id="courseSelect" list="courseNumbers" placeholder="123">
             <datalist id="courseNumbers">
@@ -119,10 +141,11 @@
         </div>
     </div>
 
-    <div class="professor-cards">
-        <!-- Professor cards will be added here dynamically -->
+    <div class="professor-cards-container">
+        <div class="professor-cards" id="professorCards">
+            <!-- Professor cards will be added here dynamically -->
+        </div>
     </div>
-
 
     <script>
 
@@ -175,7 +198,9 @@
 
     function addProfessorsToForm() {
         const professorsList = document.getElementById('professorsList');
+        const professorCards= document.getElementById('professorCards');
         professorsList.innerHTML = "";
+        professorCards.innerHTML = "";
 
         // Loop through the professor data and create checkboxes
         for (const professorInfo of professorsData) {
@@ -196,7 +221,6 @@
 
         //detect if a course has been selected. If so, get the professors
         document.getElementById('courseSelect').addEventListener('input', () => {
-            console.log('event');
             const typedSubjectCode = document.getElementById('subjectSelect').value;
             const typedCourseCode = document.getElementById('courseSelect').value;
             if ((course_data.filter(item => item.subject_code === typedSubjectCode.toUpperCase() && item.course_numbers.includes(typedCourseCode))).length !== 0){
@@ -215,6 +239,110 @@
             }
             
         });
+
+
+    // Function to create a professor card with GPA and grade breakdown chart
+function createProfessorCard(professorName, gpa, gradeBreakdown) {
+    const card = document.createElement('div');
+    card.classList.add('professor-card');
+    gpa = Math.round(gpa * 100) / 100;
+
+
+    const professorNameElement = document.createElement('p');
+    professorNameElement.classList.add('professor-name');
+    professorNameElement.textContent = professorName;
+
+    const professorGpaElement = document.createElement('p');
+    professorGpaElement.classList.add('professor-gpa');
+    professorGpaElement.textContent = `GPA: ${gpa}`;
+
+    const chartCanvas = document.createElement('canvas');
+    chartCanvas.classList.add('grade-breakdown-chart');
+    chartCanvas.width = 150;
+    chartCanvas.height = 100;
+
+    card.appendChild(professorNameElement);
+    card.appendChild(professorGpaElement);
+    card.appendChild(chartCanvas);
+
+    // Add the card to the professor cards container
+    const professorCardsContainer = document.querySelector('.professor-cards');
+    professorCardsContainer.appendChild(card);
+
+    // Create a bar chart using Chart.js
+    const ctx = chartCanvas.getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            datasets: [{
+                data: gradeBreakdown, // Example grade breakdown data
+                backgroundColor: [
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(255, 159, 64, 0.2)',
+                    'rgba(255, 205, 86, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                ],
+                borderColor: [
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(255, 205, 86, 1)',
+                    'rgba(54, 162, 235, 1)',
+                ],
+                borderWidth: 1,
+            }],
+        },
+        options: {
+            scales: {
+            y: {
+                beginAtZero: true,
+                display: false, // Hide y-axis labels
+            },
+        },
+        plugins: {
+            legend: {
+                display: false, // Hide legend
+            },
+        },
+        },
+    });
+}
+
+    // Event listener for checkbox changes
+    document.addEventListener('change', function (event) {
+        if (event.target.type === 'checkbox' && event.target.name === 'professors') {
+            const professorName = event.target.value;
+
+            if (event.target.checked) {
+                gpa = 0;
+                grade_dist = {};
+
+                //get the gpa and grade distribution
+                for (const i of professorsData){
+                    console.log(i);
+                    if (i.professor === professorName){
+                        gpa = i.average_gpa;
+                        grade_dist = i.grade_distribution;
+                    }
+                }
+
+                console.log(gpa);
+                // If the checkbox is checked, create a card
+                createProfessorCard(professorName, gpa, grade_dist);
+            } else {
+                // If the checkbox is unchecked, remove the corresponding card
+                const professorCardsContainer = document.querySelector('.professor-cards');
+                const cards = professorCardsContainer.querySelectorAll('.professor-card');
+
+                cards.forEach(card => {
+                    if (card.querySelector('.professor-name').textContent === professorName) {
+                        card.remove();
+                    }
+                });
+            }
+        }
+    });
     </script>
 </body>
 </html>
