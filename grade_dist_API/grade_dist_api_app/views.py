@@ -88,3 +88,48 @@ def get_subject_codes(request):
 
     # Convert the subject_data list to JSON
     return JsonResponse(subject_data, safe=False)
+
+def get_eval_data(request, professor_name, subject_code, course_code):
+    sections = Section_grades.objects.filter(subject_code=subject_code, course_code=course_code, professor_name=professor_name)
+
+    answers_1 = [0, 0, 0]
+    answers_2 = [0, 0, 0, 0]
+    answers_3 = [0, 0, 0, 0]
+    answers_4 = [0, 0, 0, 0]
+    answers_5 = [0, 0, 0, 0, 0, 0]
+    answers_6 = [0, 0, 0, 0, 0, 0,]
+
+    for section in sections:
+        answers_1[0] += section.answers_1_1
+        answers_1[1] += section.answers_1_1
+        answers_1[2] += section.answers_1_1
+        answers_2[0] += section.answers_2_1
+        answers_2[1] += section.answers_2_2
+        answers_2[2] += section.answers_2_3
+        answers_2[3] += section.answers_2_4
+        answers_3[0] += section.answers_3_1
+        answers_3[1] += section.answers_3_2
+        answers_3[2] += section.answers_3_3
+        answers_3[3] += section.answers_3_4
+        answers_4[0] += section.answers_4_1
+        answers_4[1] += section.answers_4_2
+        answers_4[2] += section.answers_4_3
+        answers_4[3] += section.answers_4_4
+        answers_5[0] += section.answers_5_0
+        answers_5[1] += section.answers_5_1
+        answers_5[2] += section.answers_5_2
+        answers_5[3] += section.answers_5_3
+        answers_5[4] += section.answers_5_4
+        answers_5[5] += section.answers_5_5
+        answers_6[0] += section.answers_6_1
+        answers_6[1] += section.answers_6_2
+        answers_6[2] += section.answers_6_3
+        answers_6[3] += section.answers_6_4
+        answers_6[4] += section.answers_6_5
+        answers_6[5] += section.answers_6_6
+
+    return JsonResponse({
+        'professor': professor_name,
+        'answers': {answers_1, answers_2, answers_3, answers_4, answers_5, answers_6}
+    })
+
