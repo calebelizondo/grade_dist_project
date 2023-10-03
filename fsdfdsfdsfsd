@@ -1,0 +1,47 @@
+[33mcommit 2d53c1457b78a217038b2cc4ec4e55233109fe6f[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31mgrade_dist_project/master[m[33m)[m
+Author: Caleb <calebelizondo@tamu.edu>
+Date:   Mon Oct 2 16:42:42 2023 +0000
+
+    finished professor card GPA and distribution display
+
+[33mcommit 78a606e16ac44db6655fa9f16f59ed8359a1d353[m
+Author: Caleb <calebelizondo@tamu.edu>
+Date:   Sun Oct 1 23:36:46 2023 +0000
+
+    professor card elements added
+
+[33mcommit 3240d750e9dde3b32221b7bee62dd5cffa417372[m
+Author: Caleb <calebelizondo@tamu.edu>
+Date:   Sun Oct 1 23:03:38 2023 +0000
+
+    updated ui
+
+[33mcommit 981a584dfa769c53367019e702845a1d21c7213d[m
+Author: Caleb <calebelizondo@tamu.edu>
+Date:   Sun Oct 1 00:57:26 2023 +0000
+
+    added GPA and grade dist to professor query
+
+[33mcommit dc6a8c36c6af4f43268c132c41c6d5b5620b060d[m
+Author: Caleb <calebelizondo@tamu.edu>
+Date:   Sun Oct 1 00:36:07 2023 +0000
+
+    made professor query by subject and course code
+
+[33mcommit 2c7a23331794bc6e04975ca00f639d5caf061a1d[m
+Author: Caleb <calebelizondo@tamu.edu>
+Date:   Sat Sep 30 20:56:32 2023 +0000
+
+    query subject codes and course numbers
+
+[33mcommit 416007c05b793052d9985557c0158f5fc718fff6[m
+Author: Caleb <calebelizondo@tamu.edu>
+Date:   Mon Sep 25 18:14:54 2023 +0000
+
+    populated database
+
+[33mcommit e5c5499b49959c88abe91e3070b8b5899997e70c[m
+Author: Caleb <calebelizondo@tamu.edu>
+Date:   Mon Sep 25 15:34:27 2023 +0000
+
+    set up django and virtual env

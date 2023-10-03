@@ -113,6 +113,11 @@
             border-radius: 4px;
             background-color: #f5f5f5;
         }
+
+        .highlighted {
+            border: 1px solid #00ff2a;
+            border-radius: 2px;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -157,7 +162,7 @@
         fetch('http://127.0.0.1:8000/get_subject_codes')
             .then(response => response.json())
             .then(data => {
-                console.log(data);
+        
                 course_data = data;
                 const subjectSelect = document.getElementById('subjects');
                 data.forEach(subject => {
@@ -219,6 +224,36 @@
         }
     }
 
+    // Function to find and highlight the card with the highest GPA
+function highlightHighestGpaCard() {
+    const professorCardsContainer = document.querySelector('.professor-cards');
+    const cards = Array.from(professorCardsContainer.querySelectorAll('.professor-card'));
+
+    // Find the card with the highest GPA
+    let highestGpa = -1;
+    let highestGpaCardIndex = -1;
+
+    cards.forEach((card, index) => {
+        const gpaElement = card.querySelector('.professor-gpa');
+        const gpa = parseFloat(gpaElement.textContent.split(' ')[1]); // Extract GPA value
+
+        if (gpa > highestGpa) {
+            highestGpa = gpa;
+            highestGpaCardIndex = index;
+        }
+    });
+
+    // Move the highest GPA card to the front
+    if (highestGpaCardIndex >= 0) {
+        professorCardsContainer.firstChild.classList.remove('highlighted');
+        const highestGpaCard = cards[highestGpaCardIndex];
+        professorCardsContainer.insertBefore(highestGpaCard, professorCardsContainer.firstChild);
+
+        // Highlight the card
+        highestGpaCard.classList.add('highlighted');
+    }
+}
+
         //detect if a course has been selected. If so, get the professors
         document.getElementById('courseSelect').addEventListener('input', () => {
             const typedSubjectCode = document.getElementById('subjectSelect').value;
@@ -230,7 +265,7 @@
 
                 if (data.length !== 0){
                     professorsData = data;
-                    console.log(professorsData);
+    
                     addProfessorsToForm();
                 }
 
@@ -320,16 +355,15 @@ function createProfessorCard(professorName, gpa, gradeBreakdown) {
 
                 //get the gpa and grade distribution
                 for (const i of professorsData){
-                    console.log(i);
                     if (i.professor === professorName){
                         gpa = i.average_gpa;
                         grade_dist = i.grade_distribution;
                     }
                 }
 
-                console.log(gpa);
                 // If the checkbox is checked, create a card
                 createProfessorCard(professorName, gpa, grade_dist);
+                
             } else {
                 // If the checkbox is unchecked, remove the corresponding card
                 const professorCardsContainer = document.querySelector('.professor-cards');
@@ -341,6 +375,7 @@ function createProfessorCard(professorName, gpa, gradeBreakdown) {
                     }
                 });
             }
+            highlightHighestGpaCard(); 
         }
     });
     </script>
