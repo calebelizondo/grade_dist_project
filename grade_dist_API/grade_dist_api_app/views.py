@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 
-from grade_dist_api_app.models import Section
+from grade_dist_api_app.models import Section_grades
 
 # Create your views here.
 from django.http import HttpResponse
@@ -31,7 +31,7 @@ def get_profs(request, subject_code, course_code):
     subject_code = subject_code.upper()
     course_code = course_code.upper()
 
-    section_grades = Section.objects.filter(subject_code=subject_code, course_code=course_code)
+    section_grades = Section_grades.objects.filter(subject_code=subject_code, course_code=course_code)
 
     professor_data = []
 
@@ -65,7 +65,7 @@ def get_profs(request, subject_code, course_code):
 def get_subject_codes(request):
 
     # Get all unique subject codes
-    unique_subject_codes = Section.objects.values('subject_code').distinct()
+    unique_subject_codes = Section_grades.objects.values('subject_code').distinct()
 
     # Create a dictionary to store subject codes and associated course numbers
     subject_data = []
@@ -74,7 +74,7 @@ def get_subject_codes(request):
         subject_code = subject['subject_code']
 
         # Query the database to get unique course codes for the current subject code
-        course_numbers = Section.objects.filter(subject_code=subject_code).values_list('course_code', flat=True).distinct()
+        course_numbers = Section_grades.objects.filter(subject_code=subject_code).values_list('course_code', flat=True).distinct()
         course_numbers_list = list(course_numbers)
 
         # Create a dictionary for the current subject code and its course numbers
